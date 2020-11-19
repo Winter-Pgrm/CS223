@@ -54,10 +54,43 @@ class LinearHashTable<K, V> extends HashTableBase<K, V>
         int hash = super.getHash(key);
 
         // MA TODO: find empty slot to insert (update HashItem as necessary)
-		System.out.print("The key in the add element is"+ key + " the value is " + value);
-		System.out.print(" weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee ");
 
-
+		HashItem<K, V> ct = _items.elementAt(hash);
+				
+     // System.out.println( "The Key is " +key + "The Value is " +value); 
+      //System.out.println(" The hash is " + hash);
+      int index = 0;
+      
+      
+      if(ct.getKey() == null)
+      {
+        ct.setKey(key);
+        ct.setValue(value);
+        ct.setIsEmpty(false);
+        _number_of_elements++;
+      }
+      else
+      {
+          Boolean placed = false;
+          int i = 1;
+         do
+         {
+            HashItem<K, V> newItem = _items.elementAt(hash + i);
+            if(newItem.getKey() == null)
+            {
+             newItem.setKey(key);
+             newItem.setValue(value);
+             newItem.setIsEmpty(false);
+             placed = true;
+             _number_of_elements++;
+             }
+            i++;
+         }
+         while(placed == false);
+      }
+      
+      
+   	
         // Remember how many things we are presently storing (size N)
     	//  Hint: do we always increase the size whenever this function is called?
         // _number_of_elements++;
