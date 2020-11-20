@@ -43,54 +43,67 @@ class LinearHashTable<K, V> extends HashTableBase<K, V>
     
    
     // ***** MA Section Start ************************************************ //
-
+	/*
+	*  Microassignment3: Probing Hash Table addElement and removeElement
+	*
+	*  LinearHashTable: Yet another Hash Table Implementation
+	* 
+	*  Contributors:
+	*    Alexander Phillips 
+	* 
+	*/
     // Concrete implementation for parent's addElement method
     public void addElement(K key, V value)
     {
-        // Check for size restrictions
-        resizeCheck();
+		// Check for size restrictions
+		resizeCheck();
  
-        // Calculate hash based on key
-        int hash = super.getHash(key);
+		// Calculate hash based on key
+		int hash = super.getHash(key);
 
-        // MA TODO: find empty slot to insert (update HashItem as necessary)
-
+		// MA TODO: find empty slot to insert (update HashItem as necessary)
+		
+		//Make a Hashitem to get access to the goods
 		HashItem<K, V> ct = _items.elementAt(hash);
 				
-     // System.out.println( "The Key is " +key + "The Value is " +value); 
-      //System.out.println(" The hash is " + hash);
-      int index = 0;
-      
-      
-      if(ct.getKey() == null)
-      {
-        ct.setKey(key);
-        ct.setValue(value);
-        ct.setIsEmpty(false);
-        _number_of_elements++;
-      }
-      else
-      {
-          Boolean placed = false;
-          int i = 1;
-         do
-         {
-            HashItem<K, V> newItem = _items.elementAt(hash + i);
-            if(newItem.getKey() == null)
-            {
-             newItem.setKey(key);
-             newItem.setValue(value);
-             newItem.setIsEmpty(false);
-             placed = true;
-             _number_of_elements++;
-             }
-            i++;
-         }
-         while(placed == false);
-      }
-      
-      
-   	
+		//If the Bucket is empty you are good to place it here!
+		//Just set the key, value, deleted flag and update the elements
+		if(ct.isEmpty() == true)
+		{
+		
+			ct.setKey(key);
+			ct.setValue(value);
+			ct.setIsEmpty(false);
+			_number_of_elements++;
+		}
+		//All other options fall here!
+		else
+		{
+			//Flag to get out of the do while loop
+			Boolean placed = false;
+			//i is the addtion to the offset 
+			int i = 0, offset = hash;
+			do
+			{
+				//Linear probing
+				offset = (hash +i) % _items.size();
+				//Check the newest 
+				ct = _items.elementAt(offset);
+				//if the bucket is empty or is the same key to update
+				if(ct.getKey() == null || ct.getKey().equals(key))
+				{
+				//set the all the data for the bucket
+					ct.setKey(key);
+					ct.setValue(value);
+					ct.setIsEmpty(false);
+					//flag is triggered to exit the loop
+					placed = true;
+					_number_of_elements++;
+				}
+				i++;
+			}
+			while(placed == false);
+		}
         // Remember how many things we are presently storing (size N)
     	//  Hint: do we always increase the size whenever this function is called?
         // _number_of_elements++;
@@ -105,8 +118,41 @@ class LinearHashTable<K, V> extends HashTableBase<K, V>
 
         // MA TODO: find slot to remove. Remember to check for infinite loop!
         //  ALSO: Use lazy deletion - see structure of HashItem
-
-
+		
+    	//Make a Hashitem to get access to the goods
+        HashItem<K, V> removeHT = _items.elementAt(hash);
+ 
+		//Set the offset, and the flag for the do while
+		int i = 0;
+		Boolean repeat = true;
+		int offset = hash;
+		
+		do
+		{
+			// Update the hashitem as needed to go thru 
+			removeHT = _items.elementAt(offset);
+			//if the hashitem has a key 
+			if(removeHT.getKey() != null)
+			{
+				//if the key in the bucket IS the same as key
+				if(removeHT.getKey().equals(key))
+				{
+					//Than we soft delete it. 
+					removeHT.setIsEmpty(true);
+					_number_of_elements--;
+					//set the flag to get out of the loop
+					repeat = false;
+              
+				}
+              
+			}
+			//update i offset 
+			i++;
+			//Linear probing
+			offset = (hash +i) % _items.size();
+		}
+		////if the flag is false or we went thru the whole hashtable once LEAVE!
+		while((repeat = true) && (offset != hash));
         // Make sure decrease hashtable size
     	//  Hint: do we always reduce the size whenever this function is called?
         // _number_of_elements--;
